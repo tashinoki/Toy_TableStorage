@@ -1,10 +1,14 @@
 using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 
-[assembly: FunctionStartup(typeof(Startup))]
-namespace Name
+[assembly: FunctionsStartup(typeof(Toy_CloudStorage.Startup))]
+
+namespace Toy_CloudStorage
 {
-    public class Startup: FunctionStartup
-    {}
+    public class Startup: FunctionsStartup
+    {
+        public override void Configure(IFunctionsHostBuilder builder)
+        {
+        }
+    }
 }
