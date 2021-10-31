@@ -22,8 +22,10 @@ namespace Toy_CloudStorage
             ILogger log)
         {
             var prtitionKey = Guid.NewGuid().ToString("N");
-            
-            foreach(var i in Enumerable.Range(1, 10001))
+            var sw = new Stopwatch();
+            sw.Start();
+
+            foreach (var i in Enumerable.Range(1, 10001))
             {
                 var entity = new Entity
                 {
@@ -34,6 +36,9 @@ namespace Toy_CloudStorage
                     TableOperation.Insert(entity)
                 );
             }
+            sw.Stop();
+            var elapsed = sw.ElapsedMilliseconds;
+            Console.WriteLine(elapsed);
         }
 
         [FunctionName("FetchEntity")]
