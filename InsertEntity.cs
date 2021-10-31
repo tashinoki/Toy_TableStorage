@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
+using System.Diagnostics;
 
 namespace Toy_CloudStorage
 {
@@ -33,6 +34,33 @@ namespace Toy_CloudStorage
                     TableOperation.Insert(entity)
                 );
             }
+        }
+
+        [FunctionName("FetchEntity")]
+        public static async Task FetchAsync(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [Table("ThroughputTest", "TableStorage")] CloudTable client,
+            ILogger log
+        )
+        {
+            const string partitionKey = "17cd1cb109ca4086880ba52b5146a3f0";
+            var sw = new Stopwatch();
+            sw.Start();
+
+            TableContinuationToken token = null;
+            var query = new TableQuery<Entity>()
+            .Where(
+                TableQuery.GenerateFilterCondition(nameof(Entity.PartitionKey), QueryComparisons.Equal, partitionKey)
+            );
+            do
+            {
+                var result = await client.ExecuteQuerySegmentedAsync(query, token);
+                token = result.ContinuationToken;
+            } while (token != null);
+
+            sw.Stop();
+            var elapsed = sw.ElapsedMilliseconds;
+            Console.WriteLine(elapsed);
         }
 
         private class Entity: TableEntity
